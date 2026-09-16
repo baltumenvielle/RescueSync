@@ -11,4 +11,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @EntityGraph(attributePaths = "organizacion")
     Optional<Usuario> findWithOrganizacionById(Long id);
+
+    boolean existsByUsernameIgnoreCase(String username);
 }

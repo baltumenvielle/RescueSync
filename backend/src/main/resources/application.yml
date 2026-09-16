@@ -36,6 +36,10 @@ rescuesync:
     # Secreto HMAC-SHA256 (mínimo 32 bytes). Sobrescribir con JWT_SECRET en cualquier entorno compartido.
     secret: ${JWT_SECRET:dev-secret-rescuesync-cambiar-en-produccion-0123456789}
     expiracion: ${JWT_EXPIRACION:PT8H}
+  debug:
+    # Pantalla de registro de cuentas de prueba (cualquier perfil). Desactivar con REGISTRO_DEBUG=false
+    # en cualquier entorno que no sea de desarrollo.
+    registro-habilitado: ${REGISTRO_DEBUG:true}
   internal:
     # Token compartido que los conectores REST de Bonita envían en el header X-Internal-Token.
     token: ${INTERNAL_TOKEN:dev-internal-token}

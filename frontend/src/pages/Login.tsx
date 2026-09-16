@@ -1,8 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { mensajeDeError } from '../api/client'
+import { api } from '../api/endpoints'
 import { useAuth } from '../auth/AuthContext'
 import { inicioSegunRol } from '../lib/roles'
+import { PantallaAcceso } from '../components/PantallaAcceso'
 import { Alerta, Boton, Campo, Entrada } from '../components/ui'
 
 const USUARIOS_DEMO = [
@@ -20,6 +23,7 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+  const registroDisponible = useQuery({ queryKey: ['registro-disponible'], queryFn: api.registroDisponible, staleTime: Infinity })
 
   if (usuario) return <Navigate to={inicioSegunRol(usuario.rol)} replace />
 
@@ -39,23 +43,7 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-slate-900 lg:flex-row">
-      <div className="flex flex-col justify-center px-6 pt-10 pb-6 sm:px-10 lg:w-1/2 lg:px-16">
-        <div className="flex items-center gap-3">
-          <svg viewBox="0 0 32 32" className="size-10" aria-hidden>
-            <rect width="32" height="32" rx="7" fill="#f97316" />
-            <path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#fff" />
-          </svg>
-          <span className="text-2xl font-bold text-white">RescueSync</span>
-        </div>
-        <h1 className="mt-6 max-w-md text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-4xl">
-          Coordinación regional de la respuesta ante desastres.
-        </h1>
-        <p className="mt-3 max-w-md text-slate-400">
-          Municipios, Centro Coordinador y ONGs trabajando sobre la misma emergencia, desde el registro hasta el cierre.
-        </p>
-      </div>
-      <div className="flex flex-1 items-start justify-center px-4 pb-10 sm:px-6 lg:items-center lg:bg-slate-100 lg:py-10">
+    <PantallaAcceso>
         <form onSubmit={enviar} className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl sm:p-8" noValidate>
           <h2 className="text-lg font-semibold text-slate-900">Iniciar sesión</h2>
           <div className="mt-5 flex flex-col gap-4">
@@ -74,6 +62,14 @@ export function Login() {
               Ingresar
             </Boton>
           </div>
+          {registroDisponible.data && (
+            <p className="mt-4 text-center text-sm text-slate-600">
+              ¿Necesita otra cuenta?{' '}
+              <Link to="/registro" className="font-semibold text-marca-700 hover:underline">
+                Crear cuenta de prueba
+              </Link>
+            </p>
+          )}
           {import.meta.env.DEV && (
             <div className="mt-6 border-t border-slate-100 pt-4">
               <p className="text-xs font-medium text-slate-500">Usuarios de prueba (contraseña: rescuesync)</p>
@@ -95,7 +91,6 @@ export function Login() {
             </div>
           )}
         </form>
-      </div>
-    </div>
+    </PantallaAcceso>
   )
 }

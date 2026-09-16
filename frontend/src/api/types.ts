@@ -201,3 +201,13 @@ export interface OfertaForm {
   comentario: string
   items: { loteId: number; cantidad: number }[]
 }
+
+export interface RegistroForm {
+  nombre: string
+  email: string
+  username: string
+  password: string
+  rol: Rol
+  organizacionId: number | null
+  nuevaOrganizacion: string | null
+}

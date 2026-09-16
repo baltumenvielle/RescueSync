@@ -49,6 +49,13 @@ public class GlobalExceptionHandler {
         return problema;
     }
 
+    @ExceptionHandler(CampoInvalidoException.class)
+    ProblemDetail campoInvalido(CampoInvalidoException e) {
+        ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Datos inválidos", e.getMessage());
+        problema.setProperty("errores", Map.of(e.getCampo(), e.getMessage()));
+        return problema;
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ProblemDetail cuerpoIlegible(HttpMessageNotReadableException e) {
         return problema(HttpStatus.BAD_REQUEST, "Datos inválidos", "El cuerpo de la solicitud no es válido");

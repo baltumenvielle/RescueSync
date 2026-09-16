@@ -12,6 +12,8 @@ import type {
   NuevaEmergencia,
   Oferta,
   OfertaForm,
+  Organizacion,
+  RegistroForm,
   PaginaEventos,
   Tarea,
   Usuario,
@@ -25,6 +27,15 @@ export const api = {
     datos(http.post<LoginResponse>('/auth/login', { username, password })),
   logout: () => http.post('/auth/logout'),
   me: () => datos(http.get<Usuario>('/auth/me')),
+
+  // Registro de cuentas de prueba: 404 si el backend lo tiene deshabilitado
+  organizacionesRegistro: () => datos(http.get<Organizacion[]>('/auth/registro/organizaciones')),
+  registroDisponible: () =>
+    http.get('/auth/registro/organizaciones').then(
+      () => true,
+      () => false,
+    ),
+  registrar: (body: RegistroForm) => datos(http.post<LoginResponse>('/auth/registro', body)),
 
   tareas: () => datos(http.get<Tarea[]>('/tareas')),
 

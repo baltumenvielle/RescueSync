@@ -11,6 +11,7 @@ import { Emergencias } from './pages/Emergencias'
 import { Login } from './pages/Login'
 import { NuevaEmergencia } from './pages/municipio/NuevaEmergencia'
 import { NoEncontrado } from './pages/NoEncontrado'
+import { Registro } from './pages/Registro'
 import { Convocatorias } from './pages/ong/Convocatorias'
 import { FormularioOferta } from './pages/ong/FormularioOferta'
 import { MisOfertas } from './pages/ong/MisOfertas'
@@ -18,6 +19,7 @@ import { VersionesOferta } from './pages/VersionesOferta'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
+  { path: '/registro', element: <Registro /> },
   {
     path: '/',
     element: (

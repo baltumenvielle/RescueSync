@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { CLAVE_SESION, onSesionExpirada } from '../api/client'
 import { api } from '../api/endpoints'
-import type { Rol, Usuario } from '../api/types'
+import type { LoginResponse, Rol, Usuario } from '../api/types'
 
 interface Sesion {
   token: string
@@ -13,6 +13,8 @@ interface Sesion {
 interface AuthValor {
   usuario: Usuario | null
   login: (username: string, password: string) => Promise<Usuario>
+  /** Abre la sesión con una respuesta de login ya obtenida (por ejemplo, tras registrarse). */
+  iniciarSesionCon: (respuesta: LoginResponse) => Usuario
   logout: () => void
   tieneRol: (...roles: Rol[]) => boolean
 }
@@ -51,13 +53,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => onSesionExpirada(cerrarLocal), [cerrarLocal])
 
-  const login = useCallback(async (username: string, password: string) => {
-    const r = await api.login(username, password)
+  const iniciarSesionCon = useCallback((r: LoginResponse) => {
     const nueva = { token: r.token, expiraEn: r.expiraEn, usuario: r.usuario }
     guardarSesion(nueva)
     setSesion(nueva)
     return r.usuario
   }, [])
+
+  const login = useCallback(
+    async (username: string, password: string) => iniciarSesionCon(await api.login(username, password)),
+    [iniciarSesionCon],
+  )
 
   const logout = useCallback(() => {
     api.logout().catch(() => undefined)
@@ -68,10 +74,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       usuario: sesion?.usuario ?? null,
       login,
+      iniciarSesionCon,
       logout,
       tieneRol: (...roles) => !!sesion && roles.includes(sesion.usuario.rol),
     }),
-    [sesion, login, logout],
+    [sesion, login, iniciarSesionCon, logout],
   )
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>
