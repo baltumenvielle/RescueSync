@@ -1,0 +1,65 @@
+# RescueSync - entorno local
+#   docker compose up -d postgres            -> solo la base (para correr backend/frontend en modo dev)
+#   docker compose up -d --build              -> todo el stack
+#   docker compose --profile bonita up -d    -> además levanta Bonita
+name: rescuesync
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: rescuesync
+      POSTGRES_USER: rescuesync
+      POSTGRES_PASSWORD: rescuesync
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rescuesync -d rescuesync"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/rescuesync
+      DB_USER: rescuesync
+      DB_PASSWORD: rescuesync
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-rescuesync-cambiar-en-produccion-0123456789}
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-dev-internal-token}
+      # Vacío = FakeBpmAdapter. "bonita" = integración real (cuando exista BonitaBpmAdapter).
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
+      BONITA_URL: http://bonita:8080/bonita
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+  # Los conectores REST del proceso deben apuntar a http://backend:8080/internal/bpm/...
+  # (desde Bonita Studio fuera de Docker: http://localhost:8080/internal/bpm/...).
+  bonita:
+    image: bonita:2026.2
+    profiles: ["bonita"]
+    environment:
+      TENANT_LOGIN: install
+      TENANT_PASSWORD: install
+      PLATFORM_LOGIN: platformAdmin
+      PLATFORM_PASSWORD: platform
+    ports:
+      - "8081:8080"
+    volumes:
+      - bonita-data:/opt/bonita
+
+volumes:
+  postgres-data:
+  bonita-data:
