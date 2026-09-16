@@ -1,0 +1,7 @@
+# Perfil "bonita": desactiva FakeBpmAdapter. La configuración del cliente real
+# (BonitaProperties: baseUrl, processName, processVersion) la agregan los compañeros
+# a cargo de la integración.
+bonita:
+  base-url: ${BONITA_URL:http://localhost:8081/bonita}
+  process-name: ${BONITA_PROCESS_NAME:RescueSync}
+  process-version: ${BONITA_PROCESS_VERSION:1.0}

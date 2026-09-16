@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: rescuesync-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/rescuesync}
+    username: ${DB_USER:rescuesync}
+    password: ${DB_PASSWORD:rescuesync}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+rescuesync:
+  jwt:
+    # Secreto HMAC-SHA256 (mínimo 32 bytes). Sobrescribir con JWT_SECRET en cualquier entorno compartido.
+    secret: ${JWT_SECRET:dev-secret-rescuesync-cambiar-en-produccion-0123456789}
+    expiracion: ${JWT_EXPIRACION:PT8H}
+  internal:
+    # Token compartido que los conectores REST de Bonita envían en el header X-Internal-Token.
+    token: ${INTERNAL_TOKEN:dev-internal-token}
+  bpm:
+    # Nombres de las tareas humanas tal como están en el modelo de Bonita.
+    # La comparación ignora mayúsculas y tildes.
+    tareas:
+      registro: "Registro de Emergencia"
+      revision: "Revisión de Información"
+      desglose: "Desglose en lotes de necesidades"
+      evaluar-cobertura: "Evaluar cobertura insuficiente"
+    # Si el modelo conserva la tarea humana "Registro de Emergencia", la app la completa
+    # inmediatamente después de instanciar el caso (el registro ya ocurrió en el formulario web).
+    completar-registro-al-instanciar: true
