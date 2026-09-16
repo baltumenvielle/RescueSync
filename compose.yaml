@@ -6,7 +6,7 @@ name: rescuesync
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine
     environment:
       POSTGRES_DB: rescuesync
       POSTGRES_USER: rescuesync
@@ -48,7 +48,7 @@ services:
   # Los conectores REST del proceso deben apuntar a http://backend:8080/internal/bpm/...
   # (desde Bonita Studio fuera de Docker: http://localhost:8080/internal/bpm/...).
   bonita:
-    image: bonita:2026.2
+    image: docker.io/library/bonita:2026.2
     profiles: ["bonita"]
     environment:
       TENANT_LOGIN: install
